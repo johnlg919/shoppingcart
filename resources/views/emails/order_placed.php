@@ -41,6 +41,7 @@ table.html_table
 	<tr>
 		<td><b>ID</b></td>
 		<td><b>Title</b></td>
+		<td><b>Option</b></td>
 		<td><b>Price</b></td>
 		<td><b>Quantity</b></td>
 		<td><b>Total</b></td>
@@ -53,10 +54,20 @@ table.html_table
 		{
 			$product = DB::table('products')->where('id', $product_id)->first();
 			$order_total += $product->price*$order['quantity'];
+			$options_str = "";
+			if(isset($order['options']) && count($order['options']))
+			{
+				$options = array();
+				foreach($order['options'] as $key => $value){
+					$options[] = "$key: $value";
+				}
+				$options_str = implode("<br>", $options);
+			}	
 			?>
 			<tr>
 				<td><?=$product_id?></td>
 				<td><?=$product->title?></td>
+				<td><?=$options_str?></td>
 				<td><?=number_format($product->price, 2)?></td>
 				<td><?=$order['quantity']?></td>
 				<td>$<?=number_format($product->price*$order['quantity'], 2)?></td>
@@ -67,6 +78,7 @@ table.html_table
 	}
 	?>
 	<tr>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>

@@ -6,6 +6,7 @@ use DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Product;
+use App\Product_option;
 // use Image;
 
 class ProductController extends Controller
@@ -29,6 +30,7 @@ class ProductController extends Controller
 		$msg = "";
 		$alert = "danger";
 		$quantity = "";
+		$selected = array();
 		// $products = DB::select('select * from products where id = '.$id); // using query
 		// $product = DB::table('products')->whereId($id)->first();// using query builder
 		$product = DB::table('products')->where('id', $id)->first(); // using query builder
@@ -40,9 +42,22 @@ class ProductController extends Controller
 
 		    // validations
 		    if(empty($quantity)){
-		    	$msg = "Please enter the quantity!";
+		    	$msg .= "Please enter the Quantity!<br>";
 		    } elseif(!is_numeric($quantity)){
-		    	$msg = "Please enter a number for quantity!";
+		    	$msg .= "Please enter a number for Quantity!<br>";
+		    }
+		    if($request->has('options'))
+		    {
+		    	// will pass back to product display page, to pre-set the option
+		    	$selected = $request->input('options'); 
+
+		    	// go through the array of options
+		    	foreach($request->input('options') as $key => $value)
+		    	{
+		    		if($value == ""){
+		    			$msg .= "Please select the ".ucfirst(strtolower($key))."!<br>";
+		    		}
+		    	}
 		    }
 
 		    // validation passed
@@ -60,16 +75,29 @@ class ProductController extends Controller
 		    	}
 		    	$quantity = ""; // clear quantity once added	
 
+		    	if($request->has('options'))
+		    	{
+		    		// add the option to session
+		    		$cart[$id]['options'] = $selected;
+			    }
+
 		    	// store to session
 		    	$request->session()->put('cart', $cart);
 
 		    	// show success message
 		    	$alert = "success";
-		    	$msg = $product->title." has been added. <a href='/cart'><u>Go to your Cart</u></a>";
+		    	$msg = $product->title." has been added. <a href='/cart'>
+										    				<button class='btn btn-sm btn-warning'>
+										    					<span class='glyphicon glyphicon-shopping-cart' aria-hidden='true'></span>
+										    					Go to your Cart
+										    				</button>
+		    											</a>";
 		    }
 		}
+
+		$options = Product_option::getProductOptions($id);
 		
-		return view('product', ['product' => $product , 'alert' => $alert, 'msg' => $msg, 'quantity' => $quantity]);
+		return view('product', ['product' => $product , 'alert' => $alert, 'msg' => $msg, 'quantity' => $quantity, 'options' => $options, 'selected' => $selected]);
 	}
 
 	// remove cart item

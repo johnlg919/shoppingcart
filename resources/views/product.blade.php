@@ -37,7 +37,7 @@
             $img_style = "style='height:360px; padding-top:20px;'";
         }
     }
-    
+ // dd($selected);   
     // show message if exist
     if($msg)
     {
@@ -71,6 +71,29 @@
                         <b>Qty:</b>
                         <input class"form-control" name="quantity" type="text" value="<?=$quantity?>" style="width:80px"/>
                     </div>
+                    
+                    <?php 
+
+                    foreach($options as $key => $values)
+                    {
+                        ?>
+                        <b><?=ucfirst(strtolower($key))?></b>
+                        <select name="options[<?=$key?>]">
+                            <option value="">(Select One)</option>
+                            <?php
+                            foreach($values as $value)
+                            {
+                                ?>
+                                <option value="<?=$value?>" <?php if(isset($selected[$key]) && $selected[$key] == $value) echo "selected"; ?>><?=ucfirst(strtolower($value))?></option>
+                                <?php
+                            }
+                            ?>
+                        </select>
+                        <br><br>
+                        <?php
+                    }
+                    ?>
+
                     <div class="form-group">
                         <input class="btn btn-danger" type="submit" value="Add to Cart"/>
                     </div>
